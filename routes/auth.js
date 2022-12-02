@@ -122,4 +122,32 @@ router.get("/me", isAuthenticated, async (req, res, next) => {
 	res.status(200).json(user)
 })
 
+router.post('/me', isAuthenticated, async (req, res, next) => {
+	const { name, birth } = req.body
+
+
+	try {
+		const updatedUser = await User.findByIdAndUpdate(req.payload.id, { name, birth }, { new: true });
+
+		res.status(200).json(updatedUser)
+	} catch (error) {
+		console.log(error);
+	}
+})
+
+
+router.get("/me/delete/:id", async (req, res, next) => {
+	try {
+		await User.findByIdAndRemove(req.params.id);
+		await Partners.remove(req.params.id)
+		await Achievements.remove(req.params.id)
+		await Hooks.remove(req.params.id)
+
+		req.session.destroy();
+		res.redirect("/");
+	} catch (error) {
+		console.log(error);
+	}
+})
+
 module.exports = router
