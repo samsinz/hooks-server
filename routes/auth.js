@@ -13,58 +13,59 @@ const uploader = require("./../config/cloudinary");
  */
 
 router.post("/signup", uploader.single("image"), async (req, res, next) => {
-  console.log("signup");
-  const { name, email, password, image, birth } = req.body;
-  if (email === "" || name === "" || password === "" || image === "") {
-    res
-      .status(400)
-      .json({ message: "I need some informations to work with here!" });
-  }
 
-  // ! To use only if you want to enforce strong password (not during dev-time)
+	console.log("signup");
+	const { name, email, password, image, birth } = req.body;
+	if (email === "" || name === "" || password === "") {
+		res
+			.status(400)
+			.json({ message: "I need some informations to work with here!" });
+	}
 
-  // const regex = /(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}/;
+	// ! To use only if you want to enforce strong password (not during dev-time)
 
-  // if (!regex.test(password)) {
-  // 	return res
-  // 		.status(400)
-  // 		.json({
-  // 			message:
-  // 				"Password needs to have at least 8 chars and must contain at least one number, one lowercase and one uppercase letter.",
-  // 		});
-  // }
+	// const regex = /(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}/;
 
-  try {
-    const foundUser = await User.findOne({ email });
-    if (foundUser) {
-      res
-        .status(400)
-        .json({ message: "There's another one of you, somewhere." });
-      return;
-    }
-    const salt = bcrypt.genSaltSync(saltRounds);
-    const hashedPass = bcrypt.hashSync(password, salt);
+	// if (!regex.test(password)) {
+	// 	return res
+	// 		.status(400)
+	// 		.json({
+	// 			message:
+	// 				"Password needs to have at least 8 chars and must contain at least one number, one lowercase and one uppercase letter.",
+	// 		});
+	// }
 
-    const image = req.file?.path;
-    const createdUser = await User.create({
-      name,
-      email,
-      password: hashedPass,
-      birth,
-      image,
-    });
+	try {
+		const foundUser = await User.findOne({ email });
+		if (foundUser) {
+			res
+				.status(400)
+				.json({ message: "There's another one of you, somewhere." });
+			return;
+		}
+		const salt = bcrypt.genSaltSync(saltRounds);
+		const hashedPass = bcrypt.hashSync(password, salt);
 
-    const user = createdUser.toObject();
-    delete user.password;
-    // ! Sending the user as json to the client
-    res.status(201).json({ user });
-  } catch (error) {
-    console.log(error);
-    if (error instanceof mongoose.Error.ValidationError) {
-      return res.status(400).json({ message: error.message });
-    }
-    res.status(500).json({ message: "Sweet, sweet 500." });
-  }
+		const image = req.file?.path;
+		const createdUser = await User.create({
+			name,
+			email,
+			password: hashedPass,
+			birth,
+			image,
+		});
+
+		const user = createdUser.toObject();
+		delete user.password;
+		// ! Sending the user as json to the client
+		res.status(201).json({ user });
+	} catch (error) {
+		console.log(error);
+		if (error instanceof mongoose.Error.ValidationError) {
+			return res.status(400).json({ message: error.message });
+		}
+		res.status(500).json({ message: "Sweet, sweet 500." });
+	}
 });
 
 router.post("/login", async (req, res, next) => {
@@ -154,5 +155,37 @@ router.get("/me/delete/:id", async (req, res, next) => {
 	}
 })
 
+
+router.patch('/me', isAuthenticated, uploader.single("image"), async (req, res, next) => {
+	const { name, birth } = req.body
+
+	let image = req.file?.path;
+
+	try {
+		const updatedUser = await User.findByIdAndUpdate(req.payload.id, { name, birth, image }, { new: true }).select("-password");
+
+		res.status(200).json(updatedUser)
+	} catch (error) {
+		console.log(error);
+	}
+})
+
+
+router.delete("/me", isAuthenticated, async (req, res, next) => {
+	try {
+		await User.findByIdAndRemove(req.params.id);
+		await Partners.remove(req.params.id)
+		await Achievements.remove(req.params.id)
+		await Hooks.remove(req.params.id)
+
+
+		res.sendStatus(204)
+	} catch (error) {
+		console.log(error);
+	}
+})
+
+
 module.exports = router
+
 
