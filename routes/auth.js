@@ -1,67 +1,72 @@
-const router = require("express").Router()
-const bcrypt = require("bcryptjs")
-const jwt = require("jsonwebtoken")
-const mongoose = require("mongoose")
-const isAuthenticated = require("../middlewares/jwt.middleware")
-const User = require("../models/User.model")
-const saltRounds = 10
-
+const router = require("express").Router();
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const mongoose = require("mongoose");
+const isAuthenticated = require("../middlewares/jwt.middleware");
+const User = require("../models/User.model");
+const saltRounds = 10;
+const uploader = require("./../config/cloudinary");
 /**
  *
  * * All the routes are prefixed with `/api/auth`
  *
  */
 
-router.post("/signup", async (req, res, next) => {
-	const { name, email, password } = req.body
-	if (email === "" || name === "" || password === "") {
-		res
-			.status(400)
-			.json({ message: "I need some informations to work with here!" })
-	}
+router.post("/signup", uploader.single("image"), async (req, res, next) => {
+  console.log("signup");
+  const { name, email, password, image, birth } = req.body;
+  if (email === "" || name === "" || password === "") {
+    res
+      .status(400)
+      .json({ message: "I need some informations to work with here!" });
+  }
 
-	// ! To use only if you want to enforce strong password (not during dev-time)
+  // ! To use only if you want to enforce strong password (not during dev-time)
 
-	// const regex = /(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}/;
+  // const regex = /(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}/;
 
-	// if (!regex.test(password)) {
-	// 	return res
-	// 		.status(400)
-	// 		.json({
-	// 			message:
-	// 				"Password needs to have at least 8 chars and must contain at least one number, one lowercase and one uppercase letter.",
-	// 		});
-	// }
+  // if (!regex.test(password)) {
+  // 	return res
+  // 		.status(400)
+  // 		.json({
+  // 			message:
+  // 				"Password needs to have at least 8 chars and must contain at least one number, one lowercase and one uppercase letter.",
+  // 		});
+  // }
 
-	try {
-		const foundUser = await User.findOne({ email })
-		if (foundUser) {
-			res
-				.status(400)
-				.json({ message: "There's another one of you, somewhere." })
-			return
-		}
-		const salt = bcrypt.genSaltSync(saltRounds)
-		const hashedPass = bcrypt.hashSync(password, salt)
+  try {
+    const foundUser = await User.findOne({ email });
+    if (foundUser) {
+      res
+        .status(400)
+        .json({ message: "There's another one of you, somewhere." });
+      return;
+    }
+    const salt = bcrypt.genSaltSync(saltRounds);
+    const hashedPass = bcrypt.hashSync(password, salt);
 
-		const createdUser = await User.create({
-			name,
-			email,
-			password: hashedPass,
-		})
+    const image = req.file?.path;
+    const createdUser = await User.create({
+      name,
+      email,
+      password: hashedPass,
+      birth,
+      image,
+    });
 
-		const user = createdUser.toObject()
-		delete user.password
-		// ! Sending the user as json to the client
-		res.status(201).json({ user })
-	} catch (error) {
-		console.log(error)
-		if (error instanceof mongoose.Error.ValidationError) {
-			return res.status(400).json({ message: error.message })
-		}
-		res.status(500).json({ message: "Sweet, sweet 500." })
-	}
-})
+    const user = createdUser.toObject();
+    delete user.password;
+    // ! Sending the user as json to the client
+    res.status(201).json({ user });
+  } catch (error) {
+    console.log(error);
+    if (error instanceof mongoose.Error.ValidationError) {
+      return res.status(400).json({ message: error.message });
+    }
+    res.status(500).json({ message: "Sweet, sweet 500." });
+  }
+});
+
 
 router.post("/login", async (req, res, next) => {
 	const { email, password } = req.body
@@ -122,6 +127,7 @@ router.get("/me", isAuthenticated, async (req, res, next) => {
 	res.status(200).json(user)
 })
 
+
 router.post('/me', isAuthenticated, async (req, res, next) => {
 	const { name, birth } = req.body
 
@@ -151,3 +157,4 @@ router.get("/me/delete/:id", async (req, res, next) => {
 })
 
 module.exports = router
+
