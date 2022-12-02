@@ -15,20 +15,20 @@ router.get("/private", protectRoute, (req, res, next) => {
 
 
 
-router.get("/dashboard/:userId", async (req, res, next) => {
-  const user = await User.findById(req.params.userId).populate({ path: "partners", populate: { path: "hooks", model: "Hook" } });
-  // console.log(user)
-  res.status(200).json(user);
-});
+// router.get("/dashboard/:userId", async (req, res, next) => {
+//   const user = await User.findById(req.params.userId).populate({ path: "partners", populate: { path: "hooks", model: "Hook" } });
+//   // console.log(user)
+//   res.status(200).json(user);
+// });
 
-router.get("/achievements/:userId", async (req, res, next) => {
-  const user = await User.findById(req.params.userId).populate("achievements");
-  const achievements = [];
-  for (let i = 0; i < user.achievements.length; i++) {
-    achievements.push(user.achievements[i]);
-  }
-  res.status(200).json(achievements);
-});
+// router.get("/achievements/:userId", async (req, res, next) => {
+//   const user = await User.findById(req.params.userId).populate("achievements");
+//   const achievements = [];
+//   for (let i = 0; i < user.achievements.length; i++) {
+//     achievements.push(user.achievements[i]);
+//   }
+//   res.status(200).json(achievements);
+// });
 
 
 
