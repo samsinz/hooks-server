@@ -63,7 +63,7 @@ router.post("/signup", async (req, res, next) => {
 	}
 })
 
-router.post("/signin", async (req, res, next) => {
+router.post("/login", async (req, res, next) => {
 	const { email, password } = req.body
 	if (email === "" || password === "") {
 		res
@@ -113,7 +113,12 @@ router.post("/signin", async (req, res, next) => {
 router.get("/me", isAuthenticated, async (req, res, next) => {
 	// console.log("req payload", req.payload);
 
-	const user = await User.findById(req.payload.id).select("-password")
+	const user = await User.findById(req.payload.id)
+		.select("-password")
+		.populate({ path: "partners", populate: { path: "hooks", model: "Hook" } })
+		.populate('achievements')
+		.populate('favorites')
+
 	res.status(200).json(user)
 })
 
