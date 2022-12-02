@@ -67,58 +67,65 @@ router.post("/signup", uploader.single("image"), async (req, res, next) => {
   }
 });
 
-router.post("/signin", async (req, res, next) => {
-  const { email, password } = req.body;
-  if (email === "" || password === "") {
-    res
-      .status(400)
-      .json({ message: "I need some informations to work with here!" });
-  }
-  try {
-    const foundUser = await User.findOne({ email });
-    if (!foundUser) {
-      res.status.apply(401).json({ message: "You're not yourself." });
-      return;
-    }
-    const goodPass = bcrypt.compareSync(password, foundUser.password);
-    if (goodPass) {
-      const user = foundUser.toObject();
-      delete user.password;
 
-      /**
-       * Sign method allow you to create the token.
-       *
-       * ---
-       *
-       * - First argument: user, should be an object. It is our payload !
-       * - Second argument: A-really-long-random-string...
-       * - Third argument: Options...
-       */
+router.post("/login", async (req, res, next) => {
+	const { email, password } = req.body
+	if (email === "" || password === "") {
+		res
+			.status(400)
+			.json({ message: "I need some informations to work with here!" })
+	}
+	try {
+		const foundUser = await User.findOne({ email })
+		if (!foundUser) {
+			res.status.apply(401).json({ message: "You're not yourself." })
+			return
+		}
+		const goodPass = bcrypt.compareSync(password, foundUser.password)
+		if (goodPass) {
+			const user = foundUser.toObject()
+			delete user.password
 
-      const authToken = jwt.sign({ id: user._id }, process.env.TOKEN_SECRET, {
-        algorithm: "HS256",
-        expiresIn: "2d",
-      });
+			/**
+			 * Sign method allow you to create the token.
+			 *
+			 * ---
+			 *
+			 * - First argument: user, should be an object. It is our payload !
+			 * - Second argument: A-really-long-random-string...
+			 * - Third argument: Options...
+			 */
 
-      //! Sending the authToken to the client !
+			const authToken = jwt.sign({ id: user._id }, process.env.TOKEN_SECRET, {
+				algorithm: "HS256",
+				expiresIn: "2d",
+			})
 
-      res.status(200).json({ authToken });
-    } else {
-      res.status(401).json("Can you check your typos ?");
-    }
-  } catch (error) {
-    console.log(error);
-    res
-      .status(500)
-      .json({ message: "Oh noes ! Something went terribly wrong !" });
-  }
-});
+			//! Sending the authToken to the client !
+
+			res.status(200).json({ authToken })
+		} else {
+			res.status(401).json("Can you check your typos ?")
+		}
+	} catch (error) {
+		console.log(error)
+		res
+			.status(500)
+			.json({ message: "Oh noes ! Something went terribly wrong !" })
+	}
+})
 
 router.get("/me", isAuthenticated, async (req, res, next) => {
-  // console.log("req payload", req.payload);
-  console.log("me");
-  const user = await User.findById(req.payload.id).select("-password");
-  res.status(200).json(user);
-});
+	// console.log("req payload", req.payload);
+
+	const user = await User.findById(req.payload.id)
+		.select("-password")
+		.populate({ path: "partners", populate: { path: "hooks", model: "Hook" } })
+		.populate('achievements')
+		.populate('favorites')
+
+	res.status(200).json(user)
+})
+
 
 module.exports = router;

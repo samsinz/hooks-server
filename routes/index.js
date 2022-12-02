@@ -13,9 +13,7 @@ router.get("/private", protectRoute, (req, res, next) => {
   res.send("Protection passed !");
 });
 
-router.get("/dashboard", async (req, res, next) => {
-  res.status(200).json(await User.find().populate({ path: "partners", populate: { path: "hooks", model: "Hook" } }));
-});
+
 
 router.get("/dashboard/:userId", async (req, res, next) => {
   const user = await User.findById(req.params.userId).populate({ path: "partners", populate: { path: "hooks", model: "Hook" } });
@@ -31,5 +29,7 @@ router.get("/achievements/:userId", async (req, res, next) => {
   }
   res.status(200).json(achievements);
 });
+
+
 
 module.exports = router;
