@@ -127,12 +127,13 @@ router.get("/me", isAuthenticated, async (req, res, next) => {
 	res.status(200).json(user)
 })
 
-router.post('/me', isAuthenticated, async (req, res, next) => {
+router.patch('/me', isAuthenticated, uploader.single("image"), async (req, res, next) => {
 	const { name, birth } = req.body
 
+	let image = req.file?.path;
 
 	try {
-		const updatedUser = await User.findByIdAndUpdate(req.payload.id, { name, birth }, { new: true });
+		const updatedUser = await User.findByIdAndUpdate(req.payload.id, { name, birth, image }, { new: true }).select("-password");
 
 		res.status(200).json(updatedUser)
 	} catch (error) {
@@ -141,15 +142,15 @@ router.post('/me', isAuthenticated, async (req, res, next) => {
 })
 
 
-router.get("/me/delete/:id", async (req, res, next) => {
+router.delete("/me", isAuthenticated, async (req, res, next) => {
 	try {
 		await User.findByIdAndRemove(req.params.id);
 		await Partners.remove(req.params.id)
 		await Achievements.remove(req.params.id)
 		await Hooks.remove(req.params.id)
 
-		req.session.destroy();
-		res.redirect("/");
+
+		res.sendStatus(204)
 	} catch (error) {
 		console.log(error);
 	}

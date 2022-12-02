@@ -12,7 +12,7 @@ const storage = new CloudinaryStorage({
 	cloudinary,
 	params: {
 		// allowed_formats: ["jpg", "jpeg", "png", "gif"], If you want to restrict to some filetypes
-		folder: "first-fullstack-app",
+		folder: "hooks",
 	},
 });
 
