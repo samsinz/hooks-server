@@ -69,65 +69,63 @@ router.post("/signup", uploader.single("image"), async (req, res, next) => {
 });
 
 router.post("/login", async (req, res, next) => {
-	const { email, password } = req.body;
-	if (email === "" || password === "") {
-		res
-			.status(400)
-			.json({ message: "I need some informations to work with here!" });
-	}
-	try {
-		const foundUser = await User.findOne({ email });
-		if (!foundUser) {
-			res.status(401).json({ message: "You're not yourself." });
-			return;
-		}
-		const goodPass = bcrypt.compareSync(password, foundUser.password);
-		if (goodPass) {
-			const user = foundUser.toObject();
-			delete user.password;
+  const { email, password } = req.body;
+  if (email === "" || password === "") {
+    res
+      .status(400)
+      .json({ message: "I need some informations to work with here!" });
+  }
+  try {
+    const foundUser = await User.findOne({ email });
+    if (!foundUser) {
+      res.status(401).json({ message: "You're not yourself." });
+      return;
+    }
+    const goodPass = bcrypt.compareSync(password, foundUser.password);
+    if (goodPass) {
+      const user = foundUser.toObject();
+      delete user.password;
 
-			/**
-			 * Sign method allow you to create the token.
-			 *
-			 * ---
-			 *
-			 * - First argument: user, should be an object. It is our payload !
-			 * - Second argument: A-really-long-random-string...
-			 * - Third argument: Options...
-			 */
+      /**
+       * Sign method allow you to create the token.
+       *
+       * ---
+       *
+       * - First argument: user, should be an object. It is our payload !
+       * - Second argument: A-really-long-random-string...
+       * - Third argument: Options...
+       */
 
-			const authToken = jwt.sign({ id: user._id }, process.env.TOKEN_SECRET, {
-				algorithm: "HS256",
-				expiresIn: "2d",
-			});
+      const authToken = jwt.sign({ id: user._id }, process.env.TOKEN_SECRET, {
+        algorithm: "HS256",
+        expiresIn: "2d",
+      });
 
-			//! Sending the authToken to the client !
+      //! Sending the authToken to the client !
 
-			res.status(200).json({ authToken });
-		} else {
-			res.status(401).json("Can you check your typos ?");
-		}
-	} catch (error) {
-		console.log(error);
-		res
-			.status(500)
-			.json({ message: "Oh noes ! Something went terribly wrong !" });
-	}
+      res.status(200).json({ authToken });
+    } else {
+      res.status(401).json("Can you check your typos ?");
+    }
+  } catch (error) {
+    console.log(error);
+    res
+      .status(500)
+      .json({ message: "Oh noes ! Something went terribly wrong !" });
+  }
 });
 
 router.get("/me", isAuthenticated, async (req, res, next) => {
-	// console.log("req payload", req.payload);
+  // console.log("req payload", req.payload);
 
-	const user = await User.findById(req.payload.id)
-		.select("-password")
-		.populate({ path: "partners", populate: { path: "hooks", model: "Hook" } })
-		.populate("achievements")
-		.populate("favorites");
+  const user = await User.findById(req.payload.id)
+    .select("-password")
+    .populate({ path: "partners", populate: { path: "hooks", model: "Hook" } })
+    .populate("achievements")
+    .populate("favorites");
 
-	res.status(200).json(user);
+  res.status(200).json(user);
 });
-
-
 
 router.patch(
   "/me",
@@ -145,11 +143,11 @@ router.patch(
         { new: true }
       ).select("-password");
 
-
-    res.sendStatus(200).json(UpdatedUser);
-  } catch (error) {
-    console.log(error);
+      res.status(200).json(updatedUser);
+    } catch (error) {
+      console.log(error);
+    }
   }
-});
+);
 
 module.exports = router;
