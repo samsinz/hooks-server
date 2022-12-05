@@ -27,15 +27,14 @@ router.post("/create", uploader.single("image"), async (req, res, next) => {
   } = req.body;
 
   if (
-    name === ""
-    // ||
-    // age === "" ||
-    // date === "" ||
-    // type === "" ||
-    // rating === "" ||
-    // duration === "" ||
-    // orgasm === "" ||
-    // protection === ""
+    name === "" ||
+    age === "" ||
+    date === "" ||
+    type === "" ||
+    rating === "" ||
+    duration === "" ||
+    orgasm === "" ||
+    protection === ""
   ) {
     res
       .status(400)
