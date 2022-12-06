@@ -10,7 +10,8 @@ const achievementSchema = new Schema(
 		},
 		image: {
 			type: String,
-		}
+		},
+
 	}
 );
 
