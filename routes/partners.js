@@ -23,7 +23,6 @@ router.post(
     const {
       name,
       age,
-      nationality,
       comment,
       location,
       date,
@@ -52,11 +51,11 @@ router.post(
     const image = req.file?.path;
 
     if (orgasm) {
-      gain += 50
+      gain += 50;
     }
 
     if (protection) {
-      gain += 50
+      gain += 50;
     }
 
     try {
@@ -70,7 +69,10 @@ router.post(
         protection,
       });
 
-      const user = await User.findById(req.payload.id).populate({ path: "partners", populate: { path: "hooks", model: "Hook" } })
+      const user = await User.findById(req.payload.id).populate({
+        path: "partners",
+        populate: { path: "hooks", model: "Hook" },
+      });
 
       // checkAchievement({user})
 
@@ -79,40 +81,34 @@ router.post(
       if (!onFire) {
         const lastMonthHooks = user.partners
           .reduce((acc, cur) => {
-            return [...acc, ...cur.hooks]
+            return [...acc, ...cur.hooks];
           }, [])
-          .filter(hook => hook.date > lastMonthDate)
+          .filter((hook) => hook.date > lastMonthDate);
 
         if (lastMonthHooks.length >= 5) {
-          gain += 50
+          gain += 50;
 
-          await User.findByIdAndUpdate(req.payload.id, { $push: { achievements: onFire.id } })
-
+          await User.findByIdAndUpdate(req.payload.id, {
+            $push: { achievements: onFire.id },
+          });
         }
-
       }
 
-      const lastMonthDate = new Date()
-      lastMonthDate.setMonth(lastMonthDate.getMonth() - 1)
-
-
-
+      const lastMonthDate = new Date();
+      lastMonthDate.setMonth(lastMonthDate.getMonth() - 1);
 
       const createdPartner = await Partner.create({
         name,
         age,
-        nationality,
         comment,
         image: image,
         hooks: createdHook,
       });
 
-
-
       console.log(req.payload.id);
       await User.findByIdAndUpdate(req.payload.id, {
         $push: { partners: createdPartner },
-        $inc: { score: gain }
+        $inc: { score: gain },
       });
 
       res.status(201).json({ message: "Partner created" });
