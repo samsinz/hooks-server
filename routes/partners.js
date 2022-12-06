@@ -121,4 +121,30 @@ router.post(
   }
 );
 
+router.delete("/:partnerId/delete/:hookId", isAuthenticated, async (req, res, next) => {
+  try {
+    await Partner.findByIdAndUpdate(req.params.partnerId, { $pullAll: { hooks: [{ _id: req.params.hookId }] } });
+    await Hook.findByIdAndRemove(req.params.hookId);
+    res.sendStatus(200);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.delete("/:partnerId/delete", isAuthenticated, async (req, res, next) => {
+  try {
+
+    const partnerToDelete = await Partner.findById(req.params.partnerId);
+    const hookPromises = partnerToDelete.hooks.map((hook)=> {
+      return Hook.findByIdAndRemove(hook)
+    })
+    await Promise.all(hookPromises)
+    await Partner.findByIdAndRemove(req.params.partnerId)
+    res.sendStatus(200);
+
+  } catch (error) {
+    next(error);
+  }
+});
+
 module.exports = router;
