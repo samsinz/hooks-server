@@ -71,6 +71,8 @@ router.post(
       await User.findByIdAndUpdate(req.payload.id, {
         $push: { partners: createdPartner },
       });
+
+      res.status(201).json({ message: "Partner created" });
     } catch (error) {
       if (error instanceof mongoose.Error.ValidationError) {
         return res.status(400).json({ message: error.message });
