@@ -24,6 +24,7 @@ app.use(
 app.use("/api", require("./routes/index"));
 app.use("/api/auth", require("./routes/auth"));
 app.use("/api/partners", require("./routes/partners"));
+app.use("/api/user", require("./routes/user"));
 
 require("./error-handling/index")(app);
 
