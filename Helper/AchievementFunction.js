@@ -132,7 +132,7 @@ async function checkNumber(user, achievmentName, act, number) {
         }
     })
 
-    console.log(nameOfAchievement)
+
 
 
 
@@ -161,9 +161,123 @@ async function checkNumber(user, achievmentName, act, number) {
 }
 
 
+async function checkGrade(user, achievmentName) {
+
+    const nameOfAchievement = await Achievement.findOne({ name: achievmentName });
+
+    let gain = 0;
+
+    let already = false;
+
+    user.achievements.forEach(achievement => {
+        if (achievement.toString() === nameOfAchievement.id) {
+            already = true;
+        }
+    })
+
+
+    console.log(nameOfAchievement, '==================')
+
+    if (!already) {
+
+        const lastHooks = user.partners
+            .reduce((acc, cur) => {
+                return [...acc, ...cur.hooks]
+            }, [])
+            .filter((hook) => hook.rating < 5)
+
+
+
+
+        if (lastHooks.length >= 2) {
+
+            await User.findByIdAndUpdate(user.id, { $push: { achievements: nameOfAchievement.id } })
+        }
+    }
+
+    return gain;
+
+
+}
+
+async function checkOrgasm(user, achievmentName, number) {
+
+    const nameOfAchievement = await Achievement.findOne({ name: achievmentName });
+
+    let gain = 0;
+
+    let already = false;
+
+    user.achievements.forEach(achievement => {
+        if (achievement.toString() === nameOfAchievement.id) {
+            already = true;
+        }
+    })
+
+
+
+    if (!already) {
+
+        const lastHooks = user.partners
+            .reduce((acc, cur) => {
+                return [...acc, ...cur.hooks]
+            }, [])
+            .filter((hook) => hook.orgasm === true)
+
+
+
+
+        if ((lastHooks.length + 1) >= number) {
+
+            await User.findByIdAndUpdate(user.id, { $push: { achievements: nameOfAchievement.id } })
+        }
+    }
+
+    return gain;
+
+
+}
+
+
+// async function checkAge(user, achievmentName) {
+
+//     const nameOfAchievement = await Achievement.findOne({ name: achievmentName });
+
+//     let gain = 0;
+
+//     let already = false;
+
+//     user.achievements.forEach(achievement => {
+//         if (achievement.toString() === nameOfAchievement.id) {
+//             already = true;
+//         }
+//     })
+
+
+
+//     if (!already) {
+
+//         const lastHooks = user.partners
+
+//         console.log(lastHooks.age)
+
+
+
+
+//         if ((lastHooks.length + 1) >= number) {
+
+//             await User.findByIdAndUpdate(user.id, { $push: { achievements: nameOfAchievement.id } })
+//         }
+//     }
+
+//     return gain;
+
+
+// }
 
 
 
 
 
-module.exports = { checkAchievement, checkDesert, checkShark, checkNumber };
+
+module.exports = { checkAchievement, checkDesert, checkShark, checkNumber, checkGrade, checkOrgasm };
