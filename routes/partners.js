@@ -168,7 +168,12 @@ router.delete("/:partnerId/delete", isAuthenticated, async (req, res, next) => {
 router.post("/:partnerId/edit", isAuthenticated, async (req, res, next) => {
   try {
     const partnerToEdit = await Partner.findById(req.params.partnerId);
-    await Partner.findByIdAndUpdate(req.params.partnerId, {name: req.body.name, age: req.body.age, comment: req.body.comment})
+    if(req.body.name.length>=1){
+      await Partner.findByIdAndUpdate(req.params.partnerId, {name: req.body.name, comment: req.body.comment})
+    }
+    if(req.body.age >=18){
+      await Partner.findByIdAndUpdate(req.params.partnerId, {age: req.body.age})
+    }
     res.sendStatus(200);
 
   } catch (error) {
