@@ -6,7 +6,8 @@ const Partner = require("../models/Partner.model");
 const User = require("../models/User.model");
 const uploader = require("../config/cloudinary");
 const jwt = require("jsonwebtoken");
-const Achievement = require("../models/Achievement.model");
+
+const { checkAchievement } = require("../Helper/AchievementFunction")
 /**
  *
  * * All the routes are prefixed with `/api/partners`
@@ -70,30 +71,16 @@ router.post(
         protection,
       });
 
+
+
       const user = await User.findById(req.payload.id).populate({ path: "partners", populate: { path: "hooks", model: "Hook" } })
 
-      // checkAchievement({user})
 
-      const onFire = await Achievement.findOne({ name: "On fire" });
+      gain += await checkAchievement(user, "On fire", 'setMonth', 'getMonth', 1)
 
-      if (!onFire) {
-        const lastMonthHooks = user.partners
-          .reduce((acc, cur) => {
-            return [...acc, ...cur.hooks]
-          }, [])
-          .filter(hook => hook.date > lastMonthDate)
 
-        if (lastMonthHooks.length >= 5) {
-          gain += 50
+      gain += await checkAchievement(user, "Racer against time", 'setDate', 'getDay', 6)
 
-          await User.findByIdAndUpdate(req.payload.id, { $push: { achievements: onFire.id } })
-
-        }
-
-      }
-
-      const lastMonthDate = new Date()
-      lastMonthDate.setMonth(lastMonthDate.getMonth() - 1)
 
 
 
@@ -116,11 +103,14 @@ router.post(
       });
 
       res.status(201).json({ message: "Partner created" });
+
+
+
     } catch (error) {
       if (error instanceof mongoose.Error.ValidationError) {
         return res.status(400).json({ message: error.message });
       }
-      res.status(500).json({ message: "Sweet, sweet 500." });
+      next(error)
     }
   }
 );
