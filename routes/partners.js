@@ -158,6 +158,9 @@ router.delete("/:partnerId/delete", isAuthenticated, async (req, res, next) => {
     });
     await Promise.all(hookPromises);
     await Partner.findByIdAndRemove(req.params.partnerId);
+    await User.findByIdAndUpdate(req.payload.id, {
+      $pullAll: { partners: [{ _id: req.params.partnerId }] },
+    })
     res.sendStatus(200);
   } catch (error) {
     next(error);
