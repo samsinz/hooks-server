@@ -24,7 +24,6 @@ router.post(
     const {
       name,
       age,
-      nationality,
       comment,
       location,
       date,
@@ -53,11 +52,11 @@ router.post(
     const image = req.file?.path;
 
     if (orgasm) {
-      gain += 50
+      gain += 50;
     }
 
     if (protection) {
-      gain += 50
+      gain += 50;
     }
 
     try {
@@ -73,6 +72,8 @@ router.post(
 
 
 
+
+
       const user = await User.findById(req.payload.id).populate({ path: "partners", populate: { path: "hooks", model: "Hook" } })
 
 
@@ -84,22 +85,18 @@ router.post(
 
 
 
-
       const createdPartner = await Partner.create({
         name,
         age,
-        nationality,
         comment,
         image: image,
         hooks: createdHook,
       });
 
-
-
       console.log(req.payload.id);
       await User.findByIdAndUpdate(req.payload.id, {
         $push: { partners: createdPartner },
-        $inc: { score: gain }
+        $inc: { score: gain },
       });
 
       res.status(201).json({ message: "Partner created" });
@@ -114,5 +111,31 @@ router.post(
     }
   }
 );
+
+router.delete("/:partnerId/delete/:hookId", isAuthenticated, async (req, res, next) => {
+  try {
+    await Partner.findByIdAndUpdate(req.params.partnerId, { $pullAll: { hooks: [{ _id: req.params.hookId }] } });
+    await Hook.findByIdAndRemove(req.params.hookId);
+    res.sendStatus(200);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.delete("/:partnerId/delete", isAuthenticated, async (req, res, next) => {
+  try {
+
+    const partnerToDelete = await Partner.findById(req.params.partnerId);
+    const hookPromises = partnerToDelete.hooks.map((hook)=> {
+      return Hook.findByIdAndRemove(hook)
+    })
+    await Promise.all(hookPromises)
+    await Partner.findByIdAndRemove(req.params.partnerId)
+    res.sendStatus(200);
+
+  } catch (error) {
+    next(error);
+  }
+});
 
 module.exports = router;
