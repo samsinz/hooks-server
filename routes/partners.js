@@ -7,7 +7,7 @@ const User = require("../models/User.model");
 const uploader = require("../config/cloudinary");
 const jwt = require("jsonwebtoken");
 
-const { checkAchievement } = require("../Helper/AchievementFunction")
+const { checkAchievement, checkDesert } = require("../Helper/AchievementFunction")
 /**
  *
  * * All the routes are prefixed with `/api/partners`
@@ -83,9 +83,10 @@ router.post(
 
       gain += await checkAchievement(user, "Racer against time", 'setDate', 'getDay', 6)
 
-      
-     
-      
+      checkDesert(user, "Born again virgin", 'setFullYear', 'getFullYear')
+
+
+
       let createdPartner;
       console.log({ _id });
       if (_id) {
@@ -166,7 +167,7 @@ router.delete("/:partnerId/delete", isAuthenticated, async (req, res, next) => {
 router.post("/:partnerId/edit", isAuthenticated, async (req, res, next) => {
   try {
     const partnerToEdit = await Partner.findById(req.params.partnerId);
-    await Partner.findByIdAndUpdate(req.params.partnerId, {name: req.body.name, age: req.body.age, comment: req.body.comment})
+    await Partner.findByIdAndUpdate(req.params.partnerId, { name: req.body.name, age: req.body.age, comment: req.body.comment })
     res.sendStatus(200);
 
   } catch (error) {
