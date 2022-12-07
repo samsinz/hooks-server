@@ -7,8 +7,10 @@ const User = require("../models/User.model");
 const uploader = require("../config/cloudinary");
 const jwt = require("jsonwebtoken");
 
-
-const { checkAchievement, checkDesert } = require("../Helper/AchievementFunction")
+const {
+  checkAchievement,
+  checkDesert,
+} = require("../Helper/AchievementFunction");
 
 /**
  *
@@ -96,21 +98,7 @@ router.post(
         6
       );
 
-
-
-
-      const user = await User.findById(req.payload.id).populate({ path: "partners", populate: { path: "hooks", model: "Hook" } })
-
-
-      gain += await checkAchievement(user, "On fire", 'setMonth', 'getMonth', 1)
-
-
-      gain += await checkAchievement(user, "Racer against time", 'setDate', 'getDay', 6)
-
-      checkDesert(user, "Born again virgin", 'setFullYear', 'getFullYear')
-
-
-
+      checkDesert(user, "Born again virgin", "setFullYear", "getFullYear");
 
       let createdPartner;
       console.log({ _id });
@@ -180,7 +168,7 @@ router.delete("/:partnerId/delete", isAuthenticated, async (req, res, next) => {
     await Partner.findByIdAndRemove(req.params.partnerId);
     await User.findByIdAndUpdate(req.payload.id, {
       $pullAll: { partners: [{ _id: req.params.partnerId }] },
-    })
+    });
     res.sendStatus(200);
   } catch (error) {
     next(error);
@@ -190,14 +178,18 @@ router.delete("/:partnerId/delete", isAuthenticated, async (req, res, next) => {
 router.post("/:partnerId/edit", isAuthenticated, async (req, res, next) => {
   try {
     const partnerToEdit = await Partner.findById(req.params.partnerId);
-    if(req.body.name.length>=1){
-      await Partner.findByIdAndUpdate(req.params.partnerId, {name: req.body.name, comment: req.body.comment})
+    if (req.body.name.length >= 1) {
+      await Partner.findByIdAndUpdate(req.params.partnerId, {
+        name: req.body.name,
+        comment: req.body.comment,
+      });
     }
-    if(req.body.age >=18){
-      await Partner.findByIdAndUpdate(req.params.partnerId, {age: req.body.age})
+    if (req.body.age >= 18) {
+      await Partner.findByIdAndUpdate(req.params.partnerId, {
+        age: req.body.age,
+      });
     }
     res.sendStatus(200);
-
   } catch (error) {
     next(error);
   }
