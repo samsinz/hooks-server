@@ -10,6 +10,7 @@ const jwt = require("jsonwebtoken");
 const {
   checkAchievement,
   checkDesert,
+  checkShark, checkNumber
 } = require("../Helper/AchievementFunction");
 
 /**
@@ -99,6 +100,18 @@ router.post(
       );
 
       checkDesert(user, "Born again virgin", "setFullYear", "getFullYear");
+
+
+
+      checkShark(user, "Shark")
+
+
+      checkNumber(user, "Professional kisser", "Kissing", 10)
+
+      checkNumber(user, "Professional foreplayer", "Foreplay", 10)
+
+      checkNumber(user, "Go big or go home", "Sex", 10)
+
 
       let createdPartner;
       console.log({ _id });
