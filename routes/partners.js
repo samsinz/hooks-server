@@ -21,6 +21,7 @@ router.post(
     let gain = 0;
 
     const {
+      _id,
       name,
       age,
       comment,
@@ -96,20 +97,37 @@ router.post(
 
       const lastMonthDate = new Date();
       lastMonthDate.setMonth(lastMonthDate.getMonth() - 1);
+      let createdPartner;
+      console.log({ _id });
+      if (_id) {
+        createdPartner = await Partner.findByIdAndUpdate(
+          _id,
+          {
+            $push: { hooks: createdHook },
+          },
+          { new: true }
+        );
 
-      const createdPartner = await Partner.create({
-        name,
-        age,
-        comment,
-        image: image,
-        hooks: createdHook,
-      });
+        await User.findByIdAndUpdate(req.payload.id, {
+          $inc: { score: gain },
+        });
+      } else {
+        console.log("created new one");
+        createdPartner = await Partner.create({
+          name,
+          age,
+          comment,
+          image: image,
+          hooks: createdHook,
+        });
+
+        await User.findByIdAndUpdate(req.payload.id, {
+          $push: { partners: createdPartner },
+          $inc: { score: gain },
+        });
+      }
 
       console.log(req.payload.id);
-      await User.findByIdAndUpdate(req.payload.id, {
-        $push: { partners: createdPartner },
-        $inc: { score: gain },
-      });
 
       res.status(201).json({ message: "Partner created" });
     } catch (error) {
@@ -121,27 +139,31 @@ router.post(
   }
 );
 
-router.delete("/:partnerId/delete/:hookId", isAuthenticated, async (req, res, next) => {
-  try {
-    await Partner.findByIdAndUpdate(req.params.partnerId, { $pullAll: { hooks: [{ _id: req.params.hookId }] } });
-    await Hook.findByIdAndRemove(req.params.hookId);
-    res.sendStatus(200);
-  } catch (error) {
-    next(error);
+router.delete(
+  "/:partnerId/delete/:hookId",
+  isAuthenticated,
+  async (req, res, next) => {
+    try {
+      await Partner.findByIdAndUpdate(req.params.partnerId, {
+        $pullAll: { hooks: [{ _id: req.params.hookId }] },
+      });
+      await Hook.findByIdAndRemove(req.params.hookId);
+      res.sendStatus(200);
+    } catch (error) {
+      next(error);
+    }
   }
-});
+);
 
 router.delete("/:partnerId/delete", isAuthenticated, async (req, res, next) => {
   try {
-
     const partnerToDelete = await Partner.findById(req.params.partnerId);
-    const hookPromises = partnerToDelete.hooks.map((hook)=> {
-      return Hook.findByIdAndRemove(hook)
-    })
-    await Promise.all(hookPromises)
-    await Partner.findByIdAndRemove(req.params.partnerId)
+    const hookPromises = partnerToDelete.hooks.map((hook) => {
+      return Hook.findByIdAndRemove(hook);
+    });
+    await Promise.all(hookPromises);
+    await Partner.findByIdAndRemove(req.params.partnerId);
     res.sendStatus(200);
-
   } catch (error) {
     next(error);
   }
