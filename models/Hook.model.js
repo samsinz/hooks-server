@@ -30,6 +30,9 @@ const hookSchema = new Schema(
     protection: {
       type: Boolean,
     },
+    notes: {
+      type: String,
+    },
   },
 
   {
