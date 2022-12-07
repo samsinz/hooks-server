@@ -30,16 +30,11 @@ async function checkAchievement(user, achievmentName, setter, getter, duration) 
             }, [])
             .filter((hook) => hook.date > lastDate)
 
-
-
         if (lastHooks.length >= 5) {
             gain += 50
 
             await User.findByIdAndUpdate(user.id, { $push: { achievements: nameOfAchievement.id } })
         }
-
-
-
     }
 
     return gain;
@@ -49,7 +44,7 @@ async function checkAchievement(user, achievmentName, setter, getter, duration) 
 
 
 async function checkDesert(user, achievmentName, setter, getter) {
-    console.log('hello')
+
 
     const nameOfAchievement = await Achievement.findOne({ name: achievmentName });
 
@@ -63,7 +58,7 @@ async function checkDesert(user, achievmentName, setter, getter) {
         }
     })
 
-    console.log(already)
+
 
     if (!already) {
         const lastDate = new Date()
@@ -77,7 +72,7 @@ async function checkDesert(user, achievmentName, setter, getter) {
             .filter((hook) => hook.date > lastDate)
 
 
-        console.log("=======", lastHooks)
+
         if (!lastHooks.length && user.createdAt <= lastDate) {
 
 
@@ -94,6 +89,81 @@ async function checkDesert(user, achievmentName, setter, getter) {
 }
 
 
+async function checkShark(user, achievmentName) {
+
+    const nameOfAchievement = await Achievement.findOne({ name: achievmentName });
+
+    let gain = 0;
+
+    let already = false;
+
+    user.achievements.forEach(achievement => {
+        if (achievement.toString() === nameOfAchievement.id) {
+            already = true;
+        }
+    })
+    console.log("=============", user.partners.length)
 
 
-module.exports = { checkAchievement, checkDesert };
+    if (!already) {
+        if ((user.partners.length + 1) === 50) {
+            gain += 50
+            await User.findByIdAndUpdate(user.id, { $push: { achievements: nameOfAchievement.id } })
+        }
+    }
+
+    return gain;
+
+
+}
+
+async function checkNumber(user, achievmentName, act, number) {
+
+
+    const nameOfAchievement = await Achievement.findOne({ name: achievmentName });
+
+    let gain = 0;
+
+    let already = false;
+
+    user.achievements.forEach(achievement => {
+        if (achievement.toString() === nameOfAchievement.id) {
+            already = true;
+        }
+    })
+
+    console.log(nameOfAchievement)
+
+
+
+    if (!already) {
+
+        const lastHooks = user.partners
+            .reduce((acc, cur) => {
+                return [...acc, ...cur.hooks]
+            }, [])
+            .filter((hook) => hook.type === act)
+
+
+        if (lastHooks.length === number) {
+            gain += 50
+
+            await User.findByIdAndUpdate(user.id, { $push: { achievements: nameOfAchievement.id } })
+        }
+
+
+
+    }
+
+    return gain;
+
+
+}
+
+
+
+
+
+
+
+module.exports = { checkAchievement, checkDesert, checkShark, checkNumber };
