@@ -34,6 +34,7 @@ router.post(
         duration,
         orgasm,
         protection,
+        notes,
       } = req.body;
 
       if (
@@ -69,6 +70,7 @@ router.post(
         duration,
         orgasm,
         protection,
+        notes,
       });
 
       const user = await User.findById(req.payload.id).populate({
@@ -164,22 +166,24 @@ router.delete("/:partnerId/delete", isAuthenticated, async (req, res, next) => {
   }
 });
 
-
 router.post("/:partnerId/edit", isAuthenticated, async (req, res, next) => {
   try {
     const partnerToEdit = await Partner.findById(req.params.partnerId);
-    if(req.body.name.length>=1){
-      await Partner.findByIdAndUpdate(req.params.partnerId, {name: req.body.name, comment: req.body.comment})
+    if (req.body.name.length >= 1) {
+      await Partner.findByIdAndUpdate(req.params.partnerId, {
+        name: req.body.name,
+        comment: req.body.comment,
+      });
     }
-    if(req.body.age >=18){
-      await Partner.findByIdAndUpdate(req.params.partnerId, {age: req.body.age})
+    if (req.body.age >= 18) {
+      await Partner.findByIdAndUpdate(req.params.partnerId, {
+        age: req.body.age,
+      });
     }
     res.sendStatus(200);
-
   } catch (error) {
     next(error);
   }
 });
 
 module.exports = router;
-
