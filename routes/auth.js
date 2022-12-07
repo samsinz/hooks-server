@@ -126,7 +126,7 @@ router.get("/me", isAuthenticated, async (req, res, next) => {
     .populate({ path: "partners", populate: { path: "hooks", model: "Hook" } })
     .populate("achievements")
     .populate("favorites");
-
+  console.log(user);
   res.status(200).json(user);
 });
 
@@ -153,39 +153,34 @@ router.patch(
   }
 );
 
-
-router.delete('/me', isAuthenticated, async (req, res, next) => {
-
+router.delete("/me", isAuthenticated, async (req, res, next) => {
   try {
-    const userToDelete = await User.findById(req.payload.id).populate("partners");
+    const userToDelete = await User.findById(req.payload.id).populate(
+      "partners"
+    );
 
-    const hookPromises = userToDelete.partners.map(partner => {
-      const partnerHooks = partner.hooks.map(id => {
-        return Hook.findByIdAndDelete(id)
-      })
+    const hookPromises = userToDelete.partners.map((partner) => {
+      const partnerHooks = partner.hooks.map((id) => {
+        return Hook.findByIdAndDelete(id);
+      });
       return partnerHooks;
-    })
+    });
 
     await Promise.all(hookPromises.flat());
 
-    const partnerPromises = userToDelete.partners.map(id => {
-      return Partner.findByIdAndDelete(id)
-    })
-    await Promise.all(partnerPromises)
+    const partnerPromises = userToDelete.partners.map((id) => {
+      return Partner.findByIdAndDelete(id);
+    });
+    await Promise.all(partnerPromises);
 
-
-
-    await User.findByIdAndDelete(req.payload.id)
-    res.status(200).json({ message: 'deleted' });
-
+    await User.findByIdAndDelete(req.payload.id);
+    res.status(200).json({ message: "deleted" });
 
     // await Partner.findByIdAndDelete(req.params.id);
     // await Hook.findByIdAndDelete(req.params.id);
     // await Achievement.findByIdAndDelete(req.params.id)
-
-
   } catch (error) {
-    next(error)
+    next(error);
   }
 });
 
