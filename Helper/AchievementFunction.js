@@ -6,37 +6,84 @@ const User = require("../models/User.model");
 
 async function checkAchievement(user, achievmentName, setter, getter, duration) {
 
-    const onFire = await Achievement.findOne({ name: achievmentName });
+    const nameOfAchievement = await Achievement.findOne({ name: achievmentName });
 
     let gain = 0;
 
-    let alreadyOnFire = false;
+    let already = false;
 
     user.achievements.forEach(achievement => {
-        if (achievement.toString() === onFire.id) {
-            alreadyOnFire = true;
+        if (achievement.toString() === nameOfAchievement.id) {
+            already = true;
         }
     })
 
-    console.log(alreadyOnFire)
 
-    if (!alreadyOnFire) {
-        const lastMonthDate = new Date()
-        lastMonthDate[setter](lastMonthDate[getter]() - duration)
 
-        const lastMonthHooks = user.partners
+    if (!already) {
+        const lastDate = new Date()
+        lastDate[setter](lastDate[getter]() - duration)
+
+        const lastHooks = user.partners
             .reduce((acc, cur) => {
                 return [...acc, ...cur.hooks]
             }, [])
-            .filter((hook) => hook.date > lastMonthDate)
+            .filter((hook) => hook.date > lastDate)
 
 
 
-        if (lastMonthHooks.length >= 5) {
+        if (lastHooks.length >= 5) {
             gain += 50
 
-            await User.findByIdAndUpdate(user.id, { $push: { achievements: onFire.id } })
+            await User.findByIdAndUpdate(user.id, { $push: { achievements: nameOfAchievement.id } })
         }
+
+
+
+    }
+
+    return gain;
+
+
+}
+
+
+async function checkDesert(user, achievmentName, setter, getter) {
+    console.log('hello')
+
+    const nameOfAchievement = await Achievement.findOne({ name: achievmentName });
+
+    let gain = 0;
+
+    let already = false;
+
+    user.achievements.forEach(achievement => {
+        if (achievement.toString() === nameOfAchievement.id) {
+            already = true;
+        }
+    })
+
+    console.log(already)
+
+    if (!already) {
+        const lastDate = new Date()
+        lastDate[setter](lastDate[getter]() - 1)
+
+
+        const lastHooks = user.partners
+            .reduce((acc, cur) => {
+                return [...acc, ...cur.hooks]
+            }, [])
+            .filter((hook) => hook.date > lastDate)
+
+
+        console.log("=======", lastHooks)
+        if (!lastHooks.length && user.createdAt <= lastDate) {
+
+
+            await User.findByIdAndUpdate(user.id, { $push: { achievements: nameOfAchievement.id } })
+        }
+
 
 
     }
@@ -49,4 +96,4 @@ async function checkAchievement(user, achievmentName, setter, getter, duration) 
 
 
 
-module.exports = { checkAchievement };
+module.exports = { checkAchievement, checkDesert };
