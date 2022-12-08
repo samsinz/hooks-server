@@ -1,6 +1,48 @@
 const Achievement = require("../models/Achievement.model");
 const User = require("../models/User.model");
 
+
+
+async function firstHook(
+    user,
+    achievmentName,
+) {
+    const nameOfAchievement = await Achievement.findOne({ name: achievmentName });
+
+
+
+    let already = false;
+
+    user.achievements.forEach((achievement) => {
+        if (achievement.toString() === nameOfAchievement.id) {
+            already = true;
+        }
+    });
+
+    if (!already) {
+
+
+        const lastHooks = user.partners
+
+
+
+
+        await User.findByIdAndUpdate(user.id, {
+            $push: { achievements: nameOfAchievement.id },
+        });
+
+    }
+
+
+}
+
+
+
+
+
+
+
+
 async function checkAchievement(
     user,
     achievmentName,
@@ -234,5 +276,6 @@ module.exports = {
     checkNumber,
     checkGrade,
     checkOrgasm,
-    checkProtection
+    checkProtection,
+    firstHook
 };
