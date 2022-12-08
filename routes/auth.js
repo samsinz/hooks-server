@@ -16,7 +16,7 @@ const uploader = require("./../config/cloudinary");
  */
 
 router.post("/signup", uploader.single("image"), async (req, res, next) => {
-  // console.log("signup");
+  console.log("signup");
 
   const { name, email, password, birth } = req.body;
   if (email === "" || name === "" || password === "" || birth === "") {
