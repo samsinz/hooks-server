@@ -58,6 +58,7 @@ router.post(
       }
 
       const image = req.file?.path;
+      // console.log('image')
 
       if (orgasm) {
         gain += 50;
@@ -122,7 +123,7 @@ router.post(
 
 
       let createdPartner;
-      console.log({ _id });
+      // console.log({ _id });
       if (_id) {
         createdPartner = await Partner.findByIdAndUpdate(
           _id,
@@ -136,7 +137,7 @@ router.post(
           $inc: { score: gain },
         });
       } else {
-        console.log("created new one");
+        // console.log("created new one");
         createdPartner = await Partner.create({
           name,
           age,
@@ -151,7 +152,7 @@ router.post(
         });
       }
 
-      console.log(req.payload.id);
+      // console.log(req.payload.id);
 
       res.status(201).json({ message: "Partner created" });
     } catch (error) {
