@@ -10,7 +10,7 @@ const jwt = require("jsonwebtoken");
 const {
   checkAchievement,
   checkDesert,
-  checkShark, checkNumber, checkGrade, checkOrgasm, checkProtection
+  checkShark, checkNumber, checkGrade, checkOrgasm, checkProtection, firstHook
 } = require("../Helper/AchievementFunction");
 
 /**
@@ -84,6 +84,8 @@ router.post(
         populate: { path: "hooks", model: "Hook" },
       });
 
+      firstHook(user, "Sex bomb")
+
       gain += await checkAchievement(
         user,
         "On fire",
@@ -91,6 +93,9 @@ router.post(
         "getMonth",
         1
       );
+
+
+
 
       gain += await checkAchievement(
         user,
