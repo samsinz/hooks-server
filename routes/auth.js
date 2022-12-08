@@ -63,10 +63,10 @@ router.post("/signup", uploader.single("image"), async (req, res, next) => {
     // ! Sending the user as json to the client
     res.status(201).json({ user });
   } catch (error) {
-    console.log(error);
     if (error instanceof mongoose.Error.ValidationError) {
       return res.status(400).json({ message: error.message });
     }
+    next(error);
     res.status(500).json({ message: "Sweet, sweet 500." });
   }
 });
@@ -111,7 +111,7 @@ router.post("/login", async (req, res, next) => {
       res.status(401).json("Can you check your typos ?");
     }
   } catch (error) {
-    console.log(error);
+    next(error);
     res
       .status(500)
       .json({ message: "Oh noes ! Something went terribly wrong !" });
@@ -148,7 +148,7 @@ router.patch(
 
       res.status(200).json(updatedUser);
     } catch (error) {
-      console.log(error);
+      next(error);
     }
   }
 );
