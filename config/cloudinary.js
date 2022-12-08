@@ -11,7 +11,7 @@ cloudinary.config({
 const storage = new CloudinaryStorage({
 	cloudinary,
 	params: {
-		// allowed_formats: ["jpg", "jpeg", "png", "gif"], If you want to restrict to some filetypes
+		allowed_formats: ["jpg", "jpeg", "png", "gif", 'svg', 'bmp'],
 		folder: "hooks",
 	},
 });
