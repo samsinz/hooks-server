@@ -19,7 +19,7 @@ router.get("/");
 router.post("/toggleFavorite", isAuthenticated, async (req, res, next) => {
   try {
     const partnerId = req.body.partnerId;
-    console.log(req.body.partnerId, req.body.state);
+    // console.log(req.body.partnerId, req.body.state);
     if (req.body.state) {
       await User.findByIdAndUpdate(req.payload.id, { $pullAll: { favorites: [{ _id: req.body.partnerId }] } });
     } else {
