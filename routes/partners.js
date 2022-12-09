@@ -6,6 +6,8 @@ const Partner = require("../models/Partner.model");
 const User = require("../models/User.model");
 const uploader = require("../config/cloudinary");
 const jwt = require("jsonwebtoken");
+const protectRoute = require("../middlewares/protectRoute");
+
 
 const {
   checkAchievement,
@@ -21,7 +23,7 @@ const {
 
 router.post(
   "/create",
-  isAuthenticated,
+  isAuthenticated, protectRoute,
   uploader.single("image"),
   async (req, res, next) => {
     try {
@@ -57,7 +59,12 @@ router.post(
           .json({ message: "I need some informations to work with here!" });
       }
 
-      const image = req.file?.path;
+      let image = null;
+
+      if(req.file){
+        image = req.file.path;
+      }
+      
       // console.log('image')
 
       if (orgasm) {
@@ -171,7 +178,7 @@ router.post(
 
 router.delete(
   "/:partnerId/delete/:hookId",
-  isAuthenticated,
+  isAuthenticated, protectRoute,
   async (req, res, next) => {
     try {
       await Partner.findByIdAndUpdate(req.params.partnerId, {
@@ -185,7 +192,7 @@ router.delete(
   }
 );
 
-router.delete("/:partnerId/delete", isAuthenticated, async (req, res, next) => {
+router.delete("/:partnerId/delete", isAuthenticated, protectRoute, async (req, res, next) => {
   try {
     const partnerToDelete = await Partner.findById(req.params.partnerId);
     const hookPromises = partnerToDelete.hooks.map((hook) => {
@@ -202,7 +209,7 @@ router.delete("/:partnerId/delete", isAuthenticated, async (req, res, next) => {
   }
 });
 
-router.post("/:partnerId/edit", isAuthenticated, async (req, res, next) => {
+router.post("/:partnerId/edit", isAuthenticated, protectRoute, async (req, res, next) => {
   try {
     const partnerToEdit = await Partner.findById(req.params.partnerId);
     if (req.body.name.length >= 1) {
