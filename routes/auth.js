@@ -119,6 +119,7 @@ router.post("/login", async (req, res, next) => {
 });
 
 router.get("/me", isAuthenticated, async (req, res, next) => {
+  try{
   // console.log("req payload", req.payload);
 
   const user = await User.findById(req.payload.id)
@@ -128,6 +129,9 @@ router.get("/me", isAuthenticated, async (req, res, next) => {
     .populate("favorites");
   // console.log(user);
   res.status(200).json(user);
+  }catch(error){
+    next(error)
+  }
 });
 
 router.patch(
