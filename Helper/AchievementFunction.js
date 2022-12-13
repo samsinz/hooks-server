@@ -55,7 +55,7 @@ async function checkAchievement(
     let already = false;
 
     user.achievements.forEach((achievement) => {
-        if (achievement.toString() === nameOfAchievement._id) {
+        if (achievement.toString() === nameOfAchievement.id) {
             already = true;
         }
     });
@@ -90,7 +90,7 @@ async function checkDesert(user, achievmentName, setter, getter) {
     let already = false;
 
     user.achievements.forEach((achievement) => {
-        if (achievement.toString() === nameOfAchievement._id) {
+        if (achievement.toString() === nameOfAchievement.id) {
             already = true;
         }
     });
@@ -123,7 +123,7 @@ async function checkShark(user, achievmentName) {
     let already = false;
 
     user.achievements.forEach((achievement) => {
-        if (achievement.toString() === nameOfAchievement._id) {
+        if (achievement.toString() === nameOfAchievement.id) {
             already = true;
         }
     });
@@ -149,7 +149,7 @@ async function checkNumber(user, achievmentName, act, number) {
     let already = false;
 
     user.achievements.forEach((achievement) => {
-        if (achievement.toString() === nameOfAchievement._id) {
+        if (achievement.toString() === nameOfAchievement.id) {
             already = true;
         }
     });
@@ -181,7 +181,7 @@ async function checkGrade(user, achievmentName) {
     let already = false;
 
     user.achievements.forEach((achievement) => {
-        if (achievement.toString() === nameOfAchievement._id) {
+        if (achievement.toString() === nameOfAchievement.id) {
             already = true;
         }
     });
@@ -213,7 +213,7 @@ async function checkOrgasm(user, achievmentName, number) {
     let already = false;
 
     user.achievements.forEach((achievement) => {
-        if (achievement.toString() === nameOfAchievement._id) {
+        if (achievement.toString() === nameOfAchievement.id) {
             already = true;
         }
     });
@@ -243,7 +243,7 @@ async function checkProtection(user, achievmentName, number) {
     let already = false;
 
     user.achievements.forEach((achievement) => {
-        if (achievement.toString() === nameOfAchievement._id) {
+        if (achievement.toString() === nameOfAchievement.id) {
             already = true;
         }
     });
