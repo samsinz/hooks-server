@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const UserModel = require("../models/User.model");
 
 const protectRoute = (req, res, next) => {
 	const header = req.headers["authorization"];
@@ -7,14 +8,15 @@ const protectRoute = (req, res, next) => {
 		const bearer = header.split(" ");
 		const token = bearer[1];
 
-		jwt.verify(token, process.env.TOKEN_SECRET, (err, authorizedData) => {
+		jwt.verify(token, process.env.TOKEN_SECRET, async (err, authorizedData) => {
 			if (err) {
 				//If error send Forbidden (403)
 				console.log("ERROR: Could not connect to the protected route");
 				res.sendStatus(403);
 			} else {
 				//If token is successfully verified, we can enter in the next route
-
+				const user = await UserModel.findById(authorizedData.id)
+				req.user = user
 				next();
 			}
 		});

@@ -21,9 +21,10 @@ const {
  *
  */
 
+router.use(isAuthenticated)
+
 router.post(
   "/create",
-  isAuthenticated, protectRoute,
   uploader.single("image"),
   async (req, res, next) => {
     try {
@@ -131,7 +132,7 @@ router.post(
 
       checkOrgasm(user, "Orgasm Master", 30)
 
-      checkProtection(user, "Condom Master", 10)
+      checkProtection(user, "Protector", 10)
 
 
       let createdPartner;
@@ -178,7 +179,6 @@ router.post(
 
 router.delete(
   "/:partnerId/delete/:hookId",
-  isAuthenticated, protectRoute,
   async (req, res, next) => {
     try {
       await Partner.findByIdAndUpdate(req.params.partnerId, {
@@ -192,7 +192,7 @@ router.delete(
   }
 );
 
-router.delete("/:partnerId/delete", isAuthenticated, protectRoute, async (req, res, next) => {
+router.delete("/:partnerId/delete", async (req, res, next) => {
   try {
     const partnerToDelete = await Partner.findById(req.params.partnerId);
     const hookPromises = partnerToDelete.hooks.map((hook) => {
@@ -209,7 +209,7 @@ router.delete("/:partnerId/delete", isAuthenticated, protectRoute, async (req, r
   }
 });
 
-router.post("/:partnerId/edit", isAuthenticated, protectRoute, async (req, res, next) => {
+router.post("/:partnerId/edit", async (req, res, next) => {
   try {
     const partnerToEdit = await Partner.findById(req.params.partnerId);
     if (req.body.name.length >= 1) {
