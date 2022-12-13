@@ -9,7 +9,10 @@ async function firstHook(
 ) {
     const nameOfAchievement = await Achievement.findOne({ name: achievmentName });
 
-
+    console.log(nameOfAchievement)
+    if (!nameOfAchievement){
+        return;
+    }
 
     let already = false;
 
@@ -19,16 +22,11 @@ async function firstHook(
         }
     });
 
+    console.log(already)
     if (!already) {
 
-
-        const lastHooks = user.partners
-
-
-
-
-        await User.findByIdAndUpdate(user.id, {
-            $push: { achievements: nameOfAchievement.id },
+        await User.findByIdAndUpdate(user._id, {
+            $push: { achievements: nameOfAchievement._id },
         });
 
     }
@@ -57,7 +55,7 @@ async function checkAchievement(
     let already = false;
 
     user.achievements.forEach((achievement) => {
-        if (achievement.toString() === nameOfAchievement.id) {
+        if (achievement.toString() === nameOfAchievement._id) {
             already = true;
         }
     });
@@ -75,8 +73,8 @@ async function checkAchievement(
         if (lastHooks.length >= 5) {
             gain += 50;
 
-            await User.findByIdAndUpdate(user.id, {
-                $push: { achievements: nameOfAchievement.id },
+            await User.findByIdAndUpdate(user._id, {
+                $push: { achievements: nameOfAchievement._id },
             });
         }
     }
@@ -92,7 +90,7 @@ async function checkDesert(user, achievmentName, setter, getter) {
     let already = false;
 
     user.achievements.forEach((achievement) => {
-        if (achievement.toString() === nameOfAchievement.id) {
+        if (achievement.toString() === nameOfAchievement._id) {
             already = true;
         }
     });
@@ -108,8 +106,8 @@ async function checkDesert(user, achievmentName, setter, getter) {
             .filter((hook) => hook.date > lastDate);
 
         if (!lastHooks.length && user.createdAt <= lastDate) {
-            await User.findByIdAndUpdate(user.id, {
-                $push: { achievements: nameOfAchievement.id },
+            await User.findByIdAndUpdate(user._id, {
+                $push: { achievements: nameOfAchievement._id },
             });
         }
     }
@@ -125,7 +123,7 @@ async function checkShark(user, achievmentName) {
     let already = false;
 
     user.achievements.forEach((achievement) => {
-        if (achievement.toString() === nameOfAchievement.id) {
+        if (achievement.toString() === nameOfAchievement._id) {
             already = true;
         }
     });
@@ -134,8 +132,8 @@ async function checkShark(user, achievmentName) {
     if (!already) {
         if (user.partners.length + 1 === 50) {
             gain += 50;
-            await User.findByIdAndUpdate(user.id, {
-                $push: { achievements: nameOfAchievement.id },
+            await User.findByIdAndUpdate(user._id, {
+                $push: { achievements: nameOfAchievement._id },
             });
         }
     }
@@ -151,7 +149,7 @@ async function checkNumber(user, achievmentName, act, number) {
     let already = false;
 
     user.achievements.forEach((achievement) => {
-        if (achievement.toString() === nameOfAchievement.id) {
+        if (achievement.toString() === nameOfAchievement._id) {
             already = true;
         }
     });
@@ -166,8 +164,8 @@ async function checkNumber(user, achievmentName, act, number) {
         if (lastHooks.length === number) {
             gain += 50;
 
-            await User.findByIdAndUpdate(user.id, {
-                $push: { achievements: nameOfAchievement.id },
+            await User.findByIdAndUpdate(user._id, {
+                $push: { achievements: nameOfAchievement._id },
             });
         }
     }
@@ -183,7 +181,7 @@ async function checkGrade(user, achievmentName) {
     let already = false;
 
     user.achievements.forEach((achievement) => {
-        if (achievement.toString() === nameOfAchievement.id) {
+        if (achievement.toString() === nameOfAchievement._id) {
             already = true;
         }
     });
@@ -198,8 +196,8 @@ async function checkGrade(user, achievmentName) {
             .filter((hook) => hook.rating < 5);
 
         if (lastHooks.length >= 5) {
-            await User.findByIdAndUpdate(user.id, {
-                $push: { achievements: nameOfAchievement.id },
+            await User.findByIdAndUpdate(user._id, {
+                $push: { achievements: nameOfAchievement._id },
             });
         }
     }
@@ -215,7 +213,7 @@ async function checkOrgasm(user, achievmentName, number) {
     let already = false;
 
     user.achievements.forEach((achievement) => {
-        if (achievement.toString() === nameOfAchievement.id) {
+        if (achievement.toString() === nameOfAchievement._id) {
             already = true;
         }
     });
@@ -228,8 +226,8 @@ async function checkOrgasm(user, achievmentName, number) {
             .filter((hook) => hook.orgasm === true);
 
         if (lastHooks.length + 1 >= number) {
-            await User.findByIdAndUpdate(user.id, {
-                $push: { achievements: nameOfAchievement.id },
+            await User.findByIdAndUpdate(user._id, {
+                $push: { achievements: nameOfAchievement._id },
             });
         }
     }
@@ -245,7 +243,7 @@ async function checkProtection(user, achievmentName, number) {
     let already = false;
 
     user.achievements.forEach((achievement) => {
-        if (achievement.toString() === nameOfAchievement.id) {
+        if (achievement.toString() === nameOfAchievement._id) {
             already = true;
         }
     });
@@ -260,8 +258,8 @@ async function checkProtection(user, achievmentName, number) {
         if (lastHooks.length + 1 >= number) {
 
 
-            await User.findByIdAndUpdate(user.id, {
-                $push: { achievements: nameOfAchievement.id },
+            await User.findByIdAndUpdate(user._id, {
+                $push: { achievements: nameOfAchievement._id },
             });
         }
     }

@@ -9,6 +9,8 @@ const Hook = require("../models/Hook.model");
 const Partner = require("../models/Partner.model");
 const saltRounds = 10;
 const uploader = require("./../config/cloudinary");
+const protectRoute = require("../middlewares/protectRoute");
+
 /**
  *
  * * All the routes are prefixed with `/api/auth`
